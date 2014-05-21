@@ -1,4 +1,4 @@
-# Cousera - Getting and Cleaning Data Course Project
+# Coursera - Getting and Cleaning Data Course Project
 
 This repository contains my take on the course project.
 
