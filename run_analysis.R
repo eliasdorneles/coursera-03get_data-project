@@ -1,3 +1,5 @@
+library(data.table)
+
 uci.dataset.dir <- "UCI HAR Dataset/"
 
 # get all features and filter to get only those that are mean or std,
@@ -9,7 +11,6 @@ mean.std.features <- features[grepl("(mean|std)", features[, 2]), 1]
 # dataframe with activity labels, used in the load.dataset function
 activity.labels <- read.table(file.path(uci.dataset.dir, "activity_labels.txt"),
                               col.names=c("levels", "labels"))
-
 
 load.dataset <- function (name, col.index) {
     # this function loads a dataset (which may be train or test),
@@ -30,7 +31,7 @@ load.dataset <- function (name, col.index) {
     y$activity <- factor(y$activity, activity.labels$levels, activity.labels$labels)
     dataset <- cbind(dataset, y)
 
-    dataset
+    data.table(dataset)
 }
 
 # load datasets
@@ -46,5 +47,9 @@ variables <- gsub("^t", "time", variables)
 variables <- gsub("^f", "freq", variables)
 variables <- gsub("[.]$", "", gsub("[.][.][.]?", ".", variables))
 variables <- gsub("Mag", "Magnitude", gsub("Acc", "Acceleration", variables))
+setnames(merged.dataset, colnames(merged.dataset), variables)
 
 
+# creating tidy dataset with the average by subject and activity
+tidy.with.avg <- merged.dataset[,lapply(.SD,mean),by=list(subjects, activity)]
+write.csv(tidy.with.avg, "tidy-dataset-with-averages.csv", row.names=FALSE)

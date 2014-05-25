@@ -19,7 +19,7 @@ Also, we replace the activity number code for the respective name, loading it as
 in the R dataframe.
 
 Later on, we group all this data by subject and activity, getting the average for all
-filtered columns in each group.
+filtered columns inside each group, and save the result to a CSV.
 
 
 ## Project description:
