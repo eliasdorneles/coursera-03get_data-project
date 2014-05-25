@@ -1,13 +1,25 @@
 # Coursera - Getting and Cleaning Data Course Project
 
-This repository contains my take on the course project.
+This repository contains my solution for the course project.
 
 This project needs data from the following dataset:
 
 https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
 
-All the scripts assume that this file was downloaded and extracted into
-the current directory, with the name `UCI HAR Dataset/`.
+The script `run_analysis.R` assume the file above was downloaded and extracted into
+the project directory, with the name `UCI HAR Dataset/`.
+
+
+## Description of data cleanup
+
+As we are interested only in the features related to mean and standard deviation, the
+script filter the data to get only the columns that features `"mean"` or `"std"` in its name.
+
+Also, we replace the activity number code for the respective name, loading it as a factor
+in the R dataframe.
+
+Later on, we group all this data by subject and activity, getting the average for all
+filtered columns in each group.
 
 
 ## Project description:
