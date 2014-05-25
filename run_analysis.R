@@ -1,13 +1,20 @@
 uci.dataset.dir <- "UCI HAR Dataset/"
 
-activity.labels <- read.table(file.path(uci.dataset.dir, "activity_labels.txt"),
-                              col.names=c("levels", "labels"))
-
+# get all features and filter to get only those that are mean or std,
+# the result is used in the load.dataset function
 features <- read.table(file.path(uci.dataset.dir, "features.txt"),
                            col.names=c("index", "features"))
 mean.std.features <- features[grepl("(mean|std)", features[, 2]), 1]
 
+# dataframe with activity labels, used in the load.dataset function
+activity.labels <- read.table(file.path(uci.dataset.dir, "activity_labels.txt"),
+                              col.names=c("levels", "labels"))
+
+
 load.dataset <- function (name, col.index) {
+    # this function loads a dataset (which may be train or test),
+    # filtering the columns according to argument col.index
+
     getFilename <- function(prefix) {
         file.path(uci.dataset.dir, name, paste(prefix, "_", name, ".txt", sep=""))
     }
@@ -18,14 +25,26 @@ load.dataset <- function (name, col.index) {
     subjects <- read.table(getFilename("subject"), col.names=c("subjects"))
     dataset <- cbind(dataset, subjects)
 
-    y <- read.table(getFilename("y"), col.names=c("y"))
-    y$y <- factor(y$y, activity.labels$levels, activity.labels$labels)
+    # get activities properly labeled:
+    y <- read.table(getFilename("y"), col.names=c("activity"))
+    y$activity <- factor(y$activity, activity.labels$levels, activity.labels$labels)
     dataset <- cbind(dataset, y)
 
     dataset
 }
 
+# load datasets
 train.set <- load.dataset("train", mean.std.features)
 test.set  <- load.dataset("test", mean.std.features)
 
-tidy.dataset <- rbind(train.set, test.set)
+# combine the train and test datasets into one
+merged.dataset <- rbind(train.set, test.set)
+
+# fix column names, replace prefixes with readable names and remove double dots
+variables <- colnames(merged.dataset)
+variables <- gsub("^t", "time", variables)
+variables <- gsub("^f", "freq", variables)
+variables <- gsub("[.]$", "", gsub("[.][.][.]?", ".", variables))
+variables <- gsub("Mag", "Magnitude", gsub("Acc", "Acceleration", variables))
+
+
